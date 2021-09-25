@@ -5,20 +5,22 @@ from .models import User, Semester, Grade, Parent
 
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
+        print(validated_data)
         user = User.objects.create_user(
             password=make_password(
-                validated_data['user'].pop('password')
+                validated_data.pop('password')
             ),
-            **validated_data.pop('user')
+            **validated_data
         )
+        return user
 
     def update(self, instance, validated_data):
         if 'user' in validated_data:
             instance.user.password = make_password(
-                validated_data.get('user').get(
+                validated_data.get(
                     'password', instance.user.password)
             )
-            instance.user.save()
+            instance.save()
 
     class Meta:
         model = User
@@ -31,7 +33,7 @@ class UserSerializer(serializers.ModelSerializer):
             'expeditionOfDocumentPlace',
             'sex',
             'etnicity',
-            'personalEmail',
+            'email',
             'institutionalEmail',
             'cellphoneNumber',
             'phoneNumber',

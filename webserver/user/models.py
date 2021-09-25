@@ -1,12 +1,12 @@
-from django import db
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
 
 # Create your models here.
 
 
-class User(models.Model):
+class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         db_table = 'user'
@@ -16,32 +16,43 @@ class User(models.Model):
         FEMALE = 'F', _('FEMALE')
         UNDEFINED = 'U', _('UNDEFINED')
 
-    username = models.CharField(32, unique=True)
-    password = models.CharField(64)
-    fullname = models.CharField(128)
+    username = models.CharField(max_length=32, unique=True)
+    password = models.CharField(max_length=64)
+    fullname = models.CharField(max_length=128)
     document = models.IntegerField(unique=True)
-    expeditionOfDocumentDepartment = models.CharField(64)
-    expeditionOfDocumentPlace = models.CharField(64)
+    expeditionOfDocumentDepartment = models.CharField(max_length=64)
+    expeditionOfDocumentPlace = models.CharField(max_length=64)
     sex = models.CharField(
         max_length=1,
         choices=Sex.choices,
         default=Sex.UNDEFINED
     )
-    etnicity = models.CharField(64)
-    personalEmail = models.EmailField(unique=True)
+    etnicity = models.CharField(max_length=64)
+    email = models.EmailField(unique=True)
     institutionalEmail = models.EmailField(unique=True)
-    cellphoneNumber = models.CharField(32, unique=True)
-    phoneNumber = models.CharField(32)
-    profileImage = models.CharField(256)
-    birthDate = models.CharField(64)
-    birthPlace = models.CharField(64)
-    nationality = models.CharField(64)
-    bloodType = models.CharField(64)
-    rhFactor = models.CharField(16)
-    eps = models.CharField(64)
-    direction = models.CharField(64)
-    stratum = models.CharField(32)
-    militarService = models.CharField(32)
+    cellphoneNumber = models.CharField(max_length=32, unique=True)
+    phoneNumber = models.CharField(max_length=32)
+    profileImage = models.CharField(max_length=256)
+    birthDate = models.CharField(max_length=64)
+    birthPlace = models.CharField(max_length=64)
+    nationality = models.CharField(max_length=64)
+    bloodType = models.CharField(max_length=64)
+    rhFactor = models.CharField(max_length=16)
+    eps = models.CharField(max_length=64)
+    direction = models.CharField(max_length=64)
+    stratum = models.CharField(max_length=32)
+    militarService = models.CharField(max_length=32)
+
+    objects = UserManager()
+
+    # Django specifics
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'institutionalEmail',
+                       'sex', 'document', 'nationality']
 
 
 class Semester(models.Model):
@@ -50,7 +61,7 @@ class Semester(models.Model):
         db_table = 'user.semester'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    semesterName = models.CharField(6)
+    semesterName = models.CharField(max_length=6)
 
 
 class Grade(models.Model):
@@ -64,7 +75,7 @@ class Grade(models.Model):
         ND = 'ND', _('No hay definitiva')
 
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
-    courseName = models.CharField(128)
+    courseName = models.CharField(max_length=128)
     courseFinalGrade = models.FloatField(
         default=-1, validators=[MaxValueValidator(5)])
     courseGradeText = models.CharField(
@@ -85,7 +96,7 @@ class Parent(models.Model):
         NI = 'NI', _('No informado')
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(256)
+    name = models.CharField(max_length=256)
     typeOfDocument = models.CharField(
         max_length=2,
         choices=Document.choices,
