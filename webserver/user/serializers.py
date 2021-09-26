@@ -6,8 +6,10 @@ from .scraping import SiaConnection
 
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
-        userSia = SiaConnection(
-            validated_data['username'], validated_data['password']).getUserDataAndCreateUser()
+        siaConnection = SiaConnection(
+            validated_data['username'], validated_data['password'])
+        userSia = siaConnection.getUserDataAndCreateUser()
+        parents = userSia.pop('parents')
         user = User.objects.create_user(
             username=validated_data.pop('username'),
             password=make_password(
@@ -15,6 +17,29 @@ class UserSerializer(serializers.ModelSerializer):
             ),
             **userSia
         )
+        for parent in parents:
+            Parent.objects.create(
+                user=user,
+                name=parent['name'],
+                typeOfDocument=parent['typeOfDocument'],
+                document=parent['document']
+            )
+        for semester in siaConnection.getGradesDataAndCreateGrades():
+            createdSemester = Semester.objects.create(
+                user=user,
+                semesterName=semester['semester']
+            )
+            if semester['grades'] != []:
+                for grade in semester['grades']:
+                    Grade.objects.create(
+                        user=user,
+                        semester=createdSemester,
+                        courseName=grade['courseName'],
+                        courseFinalGrade=-
+                        1 if grade['courseGrade'] == 'APROBADA' else grade['courseGrade'],
+                        courseGradeText='AP' if grade['courseAprobed'] else 'RP'
+                    )
+        siaConnection.terminate()
         return user
 
     def update(self, instance, validated_data):

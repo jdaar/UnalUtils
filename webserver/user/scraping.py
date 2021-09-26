@@ -28,12 +28,12 @@ class SiaConnection:
             self.driver.find_elements_by_css_selector(
                 ".btn[type='submit']")[0].click()
 
-    def getUserDataAndCreateUser(self):
+    def getUserDataAndCreateUser(self) -> dict:
         WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
             '//*[@id="pt1:men-portlets:sdi::head"]')).click()
         WebDriverWait(self.driver, 20).until(
             lambda x: x.find_element_by_xpath('//*[@id="pt1:men-portlets:sni"]')).click()
-        return {
+        userData = {
             'fullname': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot4::content"]')).text,
             'document': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot1::content"]')).text,
             'expeditionOfDocumentDepartment': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot7::content"]')).text,
@@ -54,57 +54,66 @@ class SiaConnection:
             'direction': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:rte1::content"]/table/tbody/tr[1]/td')).text,
             'stratum': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot69::content"]')).text,
             'militarService': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot67::content"]')).text,
+            'parents': [
+                {
+                    'name': ' '.join([x for x in [
+                        WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                            f'//*[@id="pt1:r1:{self.index}:ot30::content"]')).text,
+                        WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                            f'//*[@id="pt1:r1:{self.index}:ot31::content"]')).text,
+                        WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                            f'//*[@id="pt1:r1:{self.index}:ot33::content"]')).text,
+                    ] if x != 'No informado']),
+                    'typeOfDocument': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot37::content"]')).text,
+                    'document': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot38::content"]')).text,
+                },
+                {'name': ' '.join([x for x in [
+                    WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                        f'//*[@id="pt1:r1:{self.index}:ot32::content"]')).text,
+                    WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                        f'//*[@id="pt1:r1:{self.index}:ot35::content"]')).text,
+                    WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                        f'//*[@id="pt1:r1:{self.index}:ot36::content"]')).text,
+                ] if x != 'No informado']),
+                    'typeOfDocument': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot39::content"]')).text,
+                    'document': WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot40::content"]')).text
+                }
+            ]
         }
+        return userData
 
-    """
-	def getGradesDataAndCreateGrades(self) -> list:
-		self.index += 1
-		WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath('//*[@id="pt1:men-portlets:j_idt1::head"]')).click()
-		WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath('//*[@id="pt1:men-portlets:j_idt2"]')).click()
-		gradesArray = list()
-		semesters = WebDriverWait(self.driver, 20).until(lambda x: x.find_elements_by_xpath(f'//*[@id="pt1:r1:{self.index}:soc1::content"]/option'))
-		for semester in semesters:
-			WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:soc1::content"]')).click()
-			semester.click()
-			semesterGrades = Grades(semester.text)
-			try:
-				for course in WebDriverWait(self.driver, 5).until(lambda x: x.find_elements_by_xpath(f'//*[@id="pt1:r1:{self.index}:i1:0:i2:0:pgl6"]/*[not(@style="display:none")]')):
-					courseParsed = course.text.replace(' APROBADA', '').replace(' REPROBADA', '').split('\n')
-					if len(courseParsed) == 2:
-						semesterGrades.addGrade(courseParsed[0], courseParsed[1])
-			except TimeoutException:
-				pass
-			gradesArray.append(semesterGrades)
-		return gradesArray
-	
-	def getSchedulesDataAndCreateSchedules(self) -> Schedule:
-		#TODO: Implement schedules (Has to be on hold because there's no test data)
-		return
+    def getGradesDataAndCreateGrades(self) -> list:
+        self.index += 1
+        WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+            '//*[@id="pt1:men-portlets:j_idt1::head"]')).click()
+        WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+            '//*[@id="pt1:men-portlets:j_idt5"]')).click()
+        gradesArray = list()
+        semesters = WebDriverWait(self.driver, 20).until(lambda x: x.find_elements_by_xpath(
+            f'//*[@id="pt1:r1:{self.index}:soc1::content"]/option'))
+        for semester in semesters:
+            WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(
+                f'//*[@id="pt1:r1:{self.index}:soc1::content"]')).click()
+            semester.click()
+            semesterGrades = {
+                'semester': semester.text,
+                'grades': []
+            }
+            try:
+                for course in WebDriverWait(self.driver, 5).until(lambda x: x.find_elements_by_xpath(f'//*[@id="pt1:r1:{self.index}:i1:0:i2:0:pgl6"]/*[not(@style="display:none")]')):
+                    courseParsed = course.text.replace(
+                        ' APROBADA', '').replace(' REPROBADA', '').split('\n')
+                    if len(courseParsed) == 2:
+                        semesterGrades['grades'].append(
+                            {'courseName': courseParsed[0], 'courseGrade': courseParsed[1], 'courseAprobed': 'APROBADA' in course.text})
+            except TimeoutException:
+                pass
+            gradesArray.append(semesterGrades)
+        return gradesArray
 
-	def terminate(self) -> None:
-		self.driver.close()
+    def getSchedulesDataAndCreateSchedules(self):
+        # TODO: Implement schedules (Has to be on hold because there's no test data)
+        return
 
-		
-	"""
-
-
-"""
-			Parent(
-				" ".join([
-					WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot30::content"]')).text,
-					WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot31::content"]')).text,
-					WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot33::content"]')).text,
-				]),
-				WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot37::content"]')).text,
-				WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot38::content"]')).text
-			),
-			Parent(
-				" ".join([
-					WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot32::content"]')).text,
-					WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot35::content"]')).text,
-					WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot36::content"]')).text,
-				]),
-				WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot39::content"]')).text,
-				WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_xpath(f'//*[@id="pt1:r1:{self.index}:ot40::content"]')).text
-			),
-"""
+    def terminate(self) -> None:
+        self.driver.close()

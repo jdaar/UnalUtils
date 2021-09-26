@@ -74,6 +74,7 @@ class Grade(models.Model):
         RP = 'RP', _('Reprobado')
         ND = 'ND', _('No hay definitiva')
 
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
     courseName = models.CharField(max_length=128)
     courseFinalGrade = models.FloatField(
