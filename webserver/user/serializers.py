@@ -42,19 +42,53 @@ class UserSerializer(serializers.ModelSerializer):
         siaConnection.terminate()
         return user
 
-    def update(self, instance, validated_data):
-        if 'user' in validated_data:
-            instance.user.password = make_password(
-                validated_data.get(
-                    'password', instance.user.password)
-            )
-            instance.save()
-
     class Meta:
         model = User
         fields = (
             'username',
             'password',
+            'fullname',
+            'document',
+            'expeditionOfDocumentDepartment',
+            'expeditionOfDocumentPlace',
+            'sex',
+            'etnicity',
+            'email',
+            'institutionalEmail',
+            'cellphoneNumber',
+            'phoneNumber',
+            'profileImage',
+            'birthDate',
+            'birthPlace',
+            'nationality',
+            'bloodType',
+            'rhFactor',
+            'eps',
+            'direction',
+            'stratum',
+            'militarService'
+        )
+        read_only_fields = (
+            'fullname',
+            'document',
+            'expeditionOfDocumentDepartment',
+            'expeditionOfDocumentPlace',
+            'sex',
+            'etnicity',
+            'email',
+            'institutionalEmail',
+            'cellphoneNumber',
+            'phoneNumber',
+            'profileImage',
+            'birthDate',
+            'birthPlace',
+            'nationality',
+            'bloodType',
+            'rhFactor',
+            'eps',
+            'direction',
+            'stratum',
+            'militarService'
         )
 
 
