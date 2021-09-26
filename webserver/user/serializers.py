@@ -4,7 +4,46 @@ from .models import User, Semester, Grade, Parent
 from .scraping import SiaConnection
 
 
+class GradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = (
+            'semester',
+            'courseName',
+            'courseFinalGrade',
+            'courseGradeText'
+        )
+
+
+class SemesterSerializer(serializers.ModelSerializer):
+
+    grades = GradeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Semester
+        fields = (
+            'user',
+            'semesterName',
+            'grades'
+        )
+
+
+class ParentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Parent
+        fields = (
+            'user',
+            'name',
+            'typeOfDocument',
+            'document'
+        )
+
+
 class UserSerializer(serializers.ModelSerializer):
+
+    semesters = SemesterSerializer(many=True, read_only=True)
+    parents = ParentSerializer(many=True, read_only=True)
+
     def create(self, validated_data):
         siaConnection = SiaConnection(
             validated_data['username'], validated_data['password'])
@@ -66,7 +105,9 @@ class UserSerializer(serializers.ModelSerializer):
             'eps',
             'direction',
             'stratum',
-            'militarService'
+            'militarService',
+            'semesters',
+            'parents'
         )
         read_only_fields = (
             'fullname',
@@ -88,37 +129,5 @@ class UserSerializer(serializers.ModelSerializer):
             'eps',
             'direction',
             'stratum',
-            'militarService'
-        )
-
-
-class SemesterSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Semester
-        fields = (
-            'user',
-            'semesterName'
-        )
-
-
-class GradeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Grade
-        fields = (
-            'semester',
-            'courseName',
-            'courseFinalGrade',
-            'courseGradeText'
-        )
-
-
-class ParentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Parent
-        fields = (
-            'user',
-            'name',
-            'typeOfDocument',
-            'document'
+            'militarService',
         )
