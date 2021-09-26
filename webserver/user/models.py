@@ -61,7 +61,7 @@ class Semester(models.Model):
         db_table = 'user.semester'
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    semesterName = models.CharField(max_length=6)
+    semesterName = models.CharField(max_length=7)
 
 
 class Grade(models.Model):

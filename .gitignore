@@ -1,4 +1,5 @@
 /.venv/
+/.venvWin/
 **/node_modules/
 **.sqlite3
 **/__pycache__/

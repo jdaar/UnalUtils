@@ -1,16 +1,19 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 from .models import User, Semester, Grade, Parent
+from .scraping import SiaConnection
 
 
 class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
-        print(validated_data)
+        userSia = SiaConnection(
+            validated_data['username'], validated_data['password']).getUserDataAndCreateUser()
         user = User.objects.create_user(
+            username=validated_data.pop('username'),
             password=make_password(
                 validated_data.pop('password')
             ),
-            **validated_data
+            **userSia
         )
         return user
 
@@ -27,30 +30,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'username',
             'password',
-            'fullname',
-            'document',
-            'expeditionOfDocumentDepartment',
-            'expeditionOfDocumentPlace',
-            'sex',
-            'etnicity',
-            'email',
-            'institutionalEmail',
-            'cellphoneNumber',
-            'phoneNumber',
-            'profileImage',
-            'birthDate',
-            'birthPlace',
-            'nationality',
-            'bloodType',
-            'rhFactor',
-            'eps',
-            'direction',
-            'stratum',
-            'militarService'
         )
 
 
 class SemesterSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Semester
         fields = (
