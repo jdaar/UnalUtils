@@ -13,7 +13,7 @@ class GradeSerializer(serializers.ModelSerializer):
             'courseFinalGrade',
             'courseGradeText'
         )
-        depth = 2
+        depth = 1
 
 
 class SemesterSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class SemesterSerializer(serializers.ModelSerializer):
             'user',
             'semesterName',
         )
-        depth = 1
+        depth = 0
 
 
 class ParentSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class ParentSerializer(serializers.ModelSerializer):
             'typeOfDocument',
             'document'
         )
-        depth = 1
+        depth = 0
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -47,12 +47,14 @@ class UserSerializer(serializers.ModelSerializer):
         userSia = siaConnection.getUserDataAndCreateUser()
         parents = userSia.pop('parents')
         user = User.objects.create_user(
-            username=validated_data.pop('username'),
+            username=validated_data['username'],
             password=make_password(
-                validated_data.pop('password')
+                validated_data['password']
             ),
             **userSia
         )
+        user.set_password(validated_data['password'])
+        user.save()
         for parent in parents:
             Parent.objects.create(
                 user=user,

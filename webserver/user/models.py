@@ -19,7 +19,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=64, unique=True)
     password = models.CharField(max_length=128)
     fullname = models.CharField(max_length=128)
-    document = models.IntegerField(unique=True)
+    document = models.IntegerField(unique=True, null=True)
     expeditionOfDocumentDepartment = models.CharField(max_length=128)
     expeditionOfDocumentPlace = models.CharField(max_length=128)
     sex = models.CharField(
@@ -51,8 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'institutionalEmail',
-                       'sex', 'document', 'nationality']
+    REQUIRED_FIELDS = []
 
 
 class Semester(models.Model):
