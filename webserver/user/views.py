@@ -2,7 +2,7 @@ from .serializers import GradeSerializer, ParentSerializer, SemesterSerializer
 from .models import Grade, Parent, Semester
 from .serializers import UserSerializer
 from .models import User
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_list_or_404, render, get_object_or_404
 from rest_framework import generics
 
 # Create your views here.
@@ -26,8 +26,12 @@ class GetUser(generics.RetrieveAPIView):
 
 
 class GradesListCreate(generics.ListCreateAPIView):
-    queryset = Grade.objects.all()
     serializer_class = GradeSerializer
+
+    def get_queryset(self):
+        userid = User.objects.get(
+            username=self.request.query_params.get('username')).id
+        return get_list_or_404(Grade.objects.filter(user_id=1))
 
 
 class SemesterListCreate(generics.ListCreateAPIView):

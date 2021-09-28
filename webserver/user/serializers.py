@@ -13,19 +13,18 @@ class GradeSerializer(serializers.ModelSerializer):
             'courseFinalGrade',
             'courseGradeText'
         )
+        depth = 2
 
 
 class SemesterSerializer(serializers.ModelSerializer):
-
-    grades = GradeSerializer(many=True, read_only=True)
 
     class Meta:
         model = Semester
         fields = (
             'user',
             'semesterName',
-            'grades'
         )
+        depth = 1
 
 
 class ParentSerializer(serializers.ModelSerializer):
@@ -37,12 +36,10 @@ class ParentSerializer(serializers.ModelSerializer):
             'typeOfDocument',
             'document'
         )
+        depth = 1
 
 
 class UserSerializer(serializers.ModelSerializer):
-
-    semesters = SemesterSerializer(many=True, read_only=True)
-    parents = ParentSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         siaConnection = SiaConnection(
@@ -106,8 +103,6 @@ class UserSerializer(serializers.ModelSerializer):
             'direction',
             'stratum',
             'militarService',
-            'semesters',
-            'parents'
         )
         read_only_fields = (
             'fullname',

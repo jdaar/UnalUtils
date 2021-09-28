@@ -16,14 +16,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         FEMALE = 'F', _('FEMALE')
         UNDEFINED = 'U', _('UNDEFINED')
 
-    username = models.CharField(max_length=32, unique=True)
-    password = models.CharField(max_length=64)
+    username = models.CharField(max_length=64, unique=True)
+    password = models.CharField(max_length=128)
     fullname = models.CharField(max_length=128)
     document = models.IntegerField(unique=True)
-    expeditionOfDocumentDepartment = models.CharField(max_length=64)
-    expeditionOfDocumentPlace = models.CharField(max_length=64)
+    expeditionOfDocumentDepartment = models.CharField(max_length=128)
+    expeditionOfDocumentPlace = models.CharField(max_length=128)
     sex = models.CharField(
-        max_length=1,
+        max_length=12,
         choices=Sex.choices,
         default=Sex.UNDEFINED
     )
@@ -34,12 +34,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     phoneNumber = models.CharField(max_length=32)
     profileImage = models.CharField(max_length=256)
     birthDate = models.CharField(max_length=64)
-    birthPlace = models.CharField(max_length=64)
-    nationality = models.CharField(max_length=64)
-    bloodType = models.CharField(max_length=64)
+    birthPlace = models.CharField(max_length=128)
+    nationality = models.CharField(max_length=128)
+    bloodType = models.CharField(max_length=12)
     rhFactor = models.CharField(max_length=16)
-    eps = models.CharField(max_length=64)
-    direction = models.CharField(max_length=64)
+    eps = models.CharField(max_length=128)
+    direction = models.CharField(max_length=128)
     stratum = models.CharField(max_length=32)
     militarService = models.CharField(max_length=32)
 
@@ -80,7 +80,7 @@ class Grade(models.Model):
     courseFinalGrade = models.FloatField(
         default=-1, validators=[MaxValueValidator(5)])
     courseGradeText = models.CharField(
-        max_length=2,
+        max_length=12,
         choices=GradeText.choices,
         default=GradeText.ND
     )
@@ -99,7 +99,7 @@ class Parent(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=256)
     typeOfDocument = models.CharField(
-        max_length=2,
+        max_length=32,
         choices=Document.choices,
         default=Document.NI
     )
