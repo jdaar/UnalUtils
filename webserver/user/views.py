@@ -24,6 +24,7 @@ class GetUser(generics.RetrieveAPIView):
         filter = {'username': self.request.user.username}
         obj = get_object_or_404(queryset, **filter)
         self.check_object_permissions(self.request, obj)
+        obj.password = ""
         return obj
 
 

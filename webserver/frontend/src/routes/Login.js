@@ -3,7 +3,6 @@ import anime from "animejs/lib/anime.es.js";
 import {
   RegisterComponent,
   RegisterForm,
-  RegisterFormBackBtn,
   RegisterFormContentWrapper,
   RegisterFormFieldInput,
   RegisterFormFieldTitle,
@@ -14,6 +13,7 @@ import {
   RegisterFormNotificationWrapper,
   RegisterFormSubmitBtn,
   RegisterFormSubmitBtnWrapper,
+  RegisterFormBackBtn,
 } from "../components/Styled";
 import { useHistory } from "react-router-dom";
 
@@ -112,46 +112,52 @@ const Register = () => {
     notificationAnimationRef.current = notificationTimeline;
   }, []);
 
-  const createAccount = async () => {
+  const retrieveTokens = async () => {
     const data = {
       username: username,
       password: password,
     };
     submitAnimationRef.current.play();
-    fetch("/api/user/create/", {
+    fetch("/api/token/", {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-    }).then(async (response) => {
-      if (response.status == 201) {
-        setNotification("Usuario creado exitosamente");
-        document.getElementsByClassName(
-          RegisterFormContentWrapper.styledComponentId
-        )[0].style.position = "absolute";
-        notificationAnimationRef.current.play();
-      } else
-        setTimeout(() => {
-          setNotification("Algo ha salido mal");
-          document.getElementsByClassName(
-            RegisterFormContentWrapper.styledComponentId
-          )[0].style.position = "absolute";
-          document.getElementsByClassName(
-            RegisterFormNotificationWrapper.styledComponentId
-          )[0].style.position = "inherit";
-          notificationAnimationRef.current.play();
-        }, 4000);
-    });
+    })
+      .then((response) => {
+        if (response.status == 200) {
+          return response.json();
+        } else {
+          setTimeout(() => {
+            setNotification("Algo ha salido mal");
+            document.getElementsByClassName(
+              RegisterFormContentWrapper.styledComponentId
+            )[0].style.position = "absolute";
+            document.getElementsByClassName(
+              RegisterFormNotificationWrapper.styledComponentId
+            )[0].style.position = "inherit";
+            notificationAnimationRef.current.play();
+          }, 4000);
+        }
+      })
+      .then((data) => {
+        if (data != undefined) {
+          const setCookie = (name, value, minutes) => {
+            const date = new Date();
+            date.setTime(date.getTime + minutes * 60 * 1000);
+            document.cookie = `${name}=${value}; path=/; expires=${date.toUTCString()};`;
+          };
+          setCookie("access", "", 0);
+          setCookie("access", data.access, 10);
+          setTimeout(() => history.push("/"), 4000);
+        }
+      });
   };
 
   const reloadPage = () => {
     history.go(0);
-  };
-
-  const goToLogin = () => {
-    history.push("/login");
   };
 
   const goToHome = () => {
@@ -163,7 +169,7 @@ const Register = () => {
       <RegisterFormBackBtn onClick={goToHome}>{"<"}</RegisterFormBackBtn>
       <RegisterForm>
         <RegisterFormContentWrapper>
-          <RegisterFormMainTitle>Crear cuenta</RegisterFormMainTitle>
+          <RegisterFormMainTitle>Iniciar sesion</RegisterFormMainTitle>
           <RegisterFormFieldWrapper>
             <RegisterFormFieldTitle>
               Nombre de usuario
@@ -192,8 +198,8 @@ const Register = () => {
             />
           </RegisterFormFieldWrapper>
           <RegisterFormSubmitBtnWrapper>
-            <RegisterFormSubmitBtn onClick={createAccount}>
-              Crear cuenta
+            <RegisterFormSubmitBtn onClick={retrieveTokens}>
+              Iniciar sesion
             </RegisterFormSubmitBtn>
           </RegisterFormSubmitBtnWrapper>
         </RegisterFormContentWrapper>
@@ -203,17 +209,8 @@ const Register = () => {
             {notification}
           </RegisterFormMainTitle>
           <RegisterFormSubmitBtnWrapper>
-            <RegisterFormSubmitBtn
-              color="#25A9F0"
-              onClick={(e) =>
-                notification != "Usuario creado exitosamente"
-                  ? reloadPage()
-                  : goToLogin()
-              }
-            >
-              {notification == "Usuario creado exitosamente"
-                ? "Iniciar sesion"
-                : "Volver"}
+            <RegisterFormSubmitBtn color="#25A9F0" onClick={reloadPage}>
+              Volver
             </RegisterFormSubmitBtn>
           </RegisterFormSubmitBtnWrapper>
         </RegisterFormNotificationWrapper>

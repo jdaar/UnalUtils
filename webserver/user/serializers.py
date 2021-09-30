@@ -17,7 +17,6 @@ class GradeSerializer(serializers.ModelSerializer):
 
 
 class SemesterSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Semester
         fields = (
@@ -78,6 +77,7 @@ class UserSerializer(serializers.ModelSerializer):
                         courseGradeText='AP' if grade['courseAprobed'] else 'RP'
                     )
         siaConnection.terminate()
+        user.password = ""
         return user
 
     class Meta:

@@ -9,7 +9,9 @@ class SiaConnection:
     def __init__(self, username, password) -> None:
         # SIA index workaround
         self.index = 1
-        self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        self.driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
         self.username = username
         self.password = password
         self.authenticate()
